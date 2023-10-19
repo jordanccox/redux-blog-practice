@@ -1,10 +1,13 @@
-import { useSelector } from "react-redux";
-import { Link, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import NotFound from "./NotFound";
+import { deletePost } from "../actions";
 
 export default function PostsShow() {
   const location = useLocation();
   const posts = useSelector((state) => state.posts);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const id = Number(location.pathname.replace("/posts/", ""));
 
@@ -15,7 +18,8 @@ export default function PostsShow() {
   }
 
   const handleDelete = () => {
-    console.log(selectedPost);
+    dispatch(deletePost(selectedPost.id));
+    navigate("/");
   };
 
   const renderCategories = () => {
