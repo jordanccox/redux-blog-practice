@@ -1,17 +1,28 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import NotFound from "./NotFound";
-import { deletePost } from "../actions";
+import { deletePost, fetchPostContent } from "../actions";
+import { useEffect } from "react";
 
 export default function PostsShow() {
+  
   const location = useLocation();
-  const posts = useSelector((state) => state.posts);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const id = Number(location.pathname.replace("/posts/", ""));
+  const id = location.pathname.replace("/posts/", "");
 
-  const selectedPost = posts.find((post) => post.id === id);
+  useEffect(() => {
+    dispatch(fetchPostContent(id))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
+  const selectedPost = useSelector(state => {
+    return state.posts.find((post) => post.id === id)
+  });
+
+  console.log(selectedPost) //testing
 
   if (!selectedPost) {
     return <NotFound />

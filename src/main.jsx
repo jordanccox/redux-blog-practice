@@ -3,9 +3,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { createStore } from "redux";
+import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import promise from "redux-promise";
 
 import rootReducer from "./reducers/rootReducer";
 import Header from "./components/Header";
@@ -14,7 +15,9 @@ import NotFound from "./components/NotFound";
 import PostsShow from "./components/PostsShow";
 import NewPost from "./components/NewPost";
 
-const store = createStore(rootReducer);
+const createStoreWithMiddleware = applyMiddleware(promise)(createStore);
+
+const store = createStoreWithMiddleware(rootReducer);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
