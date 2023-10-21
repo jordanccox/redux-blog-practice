@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import _ from "lodash";
 
 import { addPost } from "../actions";
 
@@ -9,18 +10,29 @@ export default function NewPost() {
   const [categoriesUI, setCategoriesUI] = useState("");
   const [categories, setCategories] = useState([]);
   const [content, setContent] = useState("");
+  const [errors, setErrors] = useState({});
 
-  // const posts = useSelector(state => state.posts);
   const dispatch = useDispatch();
 
-  // const nextIdInSequence = () => {
-  //   const highestPostId = posts.reduce((highestPostId, post) => Math.max(post.id, highestPostId), Number.MIN_VALUE);
+  const validFields = (data) => {
+    const errorMessages = _.reduce(data, (acc, field, key) => {
+      if (!field || field.length <= 0) {
+        acc[key] = { message: `The ${key} field is required`};
+      }
 
-  //   return highestPostId + 1;
-  // };
+      if (key === "title" && field.length > 120) {
+        acc[key] = { message: `The title field must not be more than 120 characters` };
+      }
+
+      return acc;
+    }, {});
+
+    setErrors(errorMessages);
+
+    return _.isEmpty(errorMessages);
+  };
 
   const postData = {
-    // id: nextIdInSequence(),
     title: title,
     categories: categories,
     content: content
@@ -29,6 +41,10 @@ export default function NewPost() {
   const navigate = useNavigate();
 
   const handleCreatePost = () => {
+    if (!validFields(postData)) {
+      return "Error message here";
+    }
+
     dispatch(addPost(postData, () => {
       navigate("/");
     }));
@@ -58,14 +74,17 @@ export default function NewPost() {
     <div className="mb-3">
       <label htmlFor="postTitle" className="form-label">Title</label>
       <input type="text" className="form-control" id="postTitle" placeholder="My Awesome Blog Post!" value={title} onChange={handleTitleChange} />
+      <p style={{color: "red", fontWeight: "600"}}>{errors.title?.message}</p>
     </div>
     <div className="mb-3">
       <label htmlFor="postCategories" className="form-label">Categories - (Separate with a comma)</label>
       <input type="text" className="form-control" id="postCategories" placeholder="health, fitness, lifestyle" value={categoriesUI} onChange={handleCategoriesChange} />
+      <p style={{color: "red", fontWeight: "600"}}>{errors.categories?.message}</p>
     </div>
     <div className="mb-3">
       <label htmlFor="postContent" className="form-label">Post</label>
       <textarea className="form-control" id="postContent" rows="7" placeholder="What do you want to write about today?" value={content} onChange={handleContentChange}></textarea>
+      <p style={{color: "red", fontWeight: "600"}}>{errors.content?.message}</p>
     </div>
     <button type="submit" className="btn btn-primary" onClick={handleCreatePost}>Create Post</button>
     </>
