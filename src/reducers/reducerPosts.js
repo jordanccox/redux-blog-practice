@@ -1,6 +1,14 @@
+import { normalize, schema } from "normalizr";
+import _ from "lodash";
+
 import { FETCH_POSTS, DELETE_POSTS, ADD_POST, FETCH_POST_CONTENT } from "../actions";
 
-const defaultState = [];
+const postsSchema = new schema.Entity('posts');
+
+const defaultState = {
+  entries: {},
+  order: []
+};
 
 export default function postsReducer(state = defaultState, action) {
   switch (action.type) {
@@ -11,16 +19,19 @@ export default function postsReducer(state = defaultState, action) {
 
       posts.forEach((post) => {
         const data = {
-          title: post.title || "",
-          id: post._id || "",
-          categories: post.categories || [],
-          content: post.content || ""
+          title: post.title,
+          id: post._id,
         };
 
         postsArray.push(data);
       });
 
-      return postsArray;
+      const normalizedPosts = normalize(postsArray, [postsSchema]);
+
+      return {
+        entries: normalizedPosts.entities.posts,
+        order: normalizedPosts.result
+      };
     }
     case FETCH_POST_CONTENT: {
       const post = action.payload.data;
@@ -32,29 +43,33 @@ export default function postsReducer(state = defaultState, action) {
         content: post.content
       };
 
-      if (state.length > 0) {
-        return state.map((post) => {
-          if (post.id === postData.id) {
-            return postData;
-          }
-
-          return post;
-        });
-      } else {
-        return [...state, postData];
-      }
+      return {
+        entries: { ...state.entries, [action.payload.data._id]: postData },
+        order: _.union([...state.order], [action.payload.data._id])
+      };
     }
     case DELETE_POSTS: {
-      const posts = state.filter((post) => post.id !== action.payload.data);
+      const postsOrder = state.order.filter((post) => post.id !== action.payload.data);
 
-      return posts;
+      return {
+        entries: _.omit(state.entries, action.payload.data),
+        order: [postsOrder]
+      };
     }
     case ADD_POST: {
-      const posts = [...state];
+      const post = action.payload.data;
 
-      posts.push(action.payload);
+      const postData = {
+        title: post.title,
+        categories: post.categories,
+        id: post._id,
+        content: post.content
+      };
 
-      return posts;
+      return {
+        entries: { ...state.entries, [action.payload.data._id]: postData },
+        order: _.union([...state.order], [action.payload.data._id])
+      };
     }
     default:
       return state;

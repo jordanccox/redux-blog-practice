@@ -18,8 +18,8 @@ export default function PostsShow() {
   }, []);
 
 
-  const selectedPost = useSelector(state => {
-    return state.posts.find((post) => post.id === id)
+  const selectedPost = useSelector(({ posts }) => {
+    return posts.entries[id]
   });
 
   console.log(selectedPost) //testing
@@ -33,7 +33,7 @@ export default function PostsShow() {
   };
 
   const renderCategories = () => {
-    if (selectedPost.categories.length <= 0) {
+    if (!selectedPost.categories) {
       return <i>None</i>
     }
 
