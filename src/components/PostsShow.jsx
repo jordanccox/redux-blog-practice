@@ -29,8 +29,7 @@ export default function PostsShow() {
   }
 
   const handleDelete = () => {
-    dispatch(deletePost(selectedPost.id));
-    navigate("/");
+    dispatch(deletePost(selectedPost.id, () => navigate("/")));
   };
 
   const renderCategories = () => {

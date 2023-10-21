@@ -25,16 +25,24 @@ export function fetchPostContent(id) {
   }
 }
 
-export function deletePost(id) {
+export function deletePost(id, callback) {
+  const request = axios.delete(`${ROOT_URL}/posts/${id}`);
+
+  request.then(() => callback());
+
   return {
     type: DELETE_POSTS,
-    payload: id
+    payload: request
   };
 }
 
-export function addPost(data) {
+export function addPost(data, callback) {
+  const request = axios.post(`${ROOT_URL}/posts`, data);
+
+  request.then(() => callback());
+
   return {
     type: ADD_POST,
-    payload: data
+    payload: request
   };
 }

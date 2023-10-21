@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { addPost } from "../actions";
@@ -10,17 +10,17 @@ export default function NewPost() {
   const [categories, setCategories] = useState([]);
   const [content, setContent] = useState("");
 
-  const posts = useSelector(state => state.posts);
+  // const posts = useSelector(state => state.posts);
   const dispatch = useDispatch();
 
-  const nextIdInSequence = () => {
-    const highestPostId = posts.reduce((highestPostId, post) => Math.max(post.id, highestPostId), Number.MIN_VALUE);
+  // const nextIdInSequence = () => {
+  //   const highestPostId = posts.reduce((highestPostId, post) => Math.max(post.id, highestPostId), Number.MIN_VALUE);
 
-    return highestPostId + 1;
-  };
+  //   return highestPostId + 1;
+  // };
 
   const postData = {
-    id: nextIdInSequence(),
+    // id: nextIdInSequence(),
     title: title,
     categories: categories,
     content: content
@@ -29,8 +29,9 @@ export default function NewPost() {
   const navigate = useNavigate();
 
   const handleCreatePost = () => {
-    dispatch(addPost(postData));
-    navigate("/");
+    dispatch(addPost(postData, () => {
+      navigate("/");
+    }));
   };
 
   const handleTitleChange = (event) => {

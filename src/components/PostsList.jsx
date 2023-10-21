@@ -5,9 +5,9 @@ export default function PostsList() {
   const posts = useSelector((state) => state.posts);
 
   if (posts.length > 0) {
-    return posts.map((post) => {
+    return posts.map((post, index) => {
       return (
-        <li className="list-group-item" key={post.id}>
+        <li className="list-group-item" key={index}>
           <Link to={`/posts/${post.id}`}>
             {post.title}
           </Link>
